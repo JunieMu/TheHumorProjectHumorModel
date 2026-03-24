@@ -8,12 +8,15 @@ import { ArrowLeft, Play, Loader2, Save, Trash2 } from "lucide-react";
 import { LogoutButton } from "@/components/LogoutButton";
 import { useRouter } from "next/navigation";
 
+import { HumorFlavorStepList } from "@/components/HumorFlavorStepList";
+
 interface FlavorPageProps {
   params: { id: string };
 }
 
 export default function FlavorPage({ params }: FlavorPageProps) {
   const flavorId = params.id;
+  const numericFlavorId = parseInt(flavorId);
   const router = useRouter();
   const [flavor, setFlavor] = useState<HumorFlavor | null>(null);
   const [loading, setLoading] = useState(true);
@@ -118,23 +121,7 @@ export default function FlavorPage({ params }: FlavorPageProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <section className="md:col-span-2 space-y-8">
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold font-typewriter text-vintage-gray uppercase">
-                Prompt Steps
-              </h2>
-              <button className="vintage-button text-xs uppercase font-bold tracking-tight">
-                + Add Step
-              </button>
-            </div>
-            
-            {/* Steps will go here in the next task */}
-            <div className="flex flex-col items-center justify-center py-20 bg-vintage-cream/50 border-2 border-dashed border-vintage-gray/20">
-              <p className="font-typewriter text-sm text-vintage-gray/60 italic">
-                This flavor currently has no steps defined.
-              </p>
-            </div>
-          </div>
+          <HumorFlavorStepList flavorId={numericFlavorId} />
         </section>
 
         <aside className="space-y-6">

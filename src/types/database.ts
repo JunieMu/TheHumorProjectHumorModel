@@ -21,4 +21,33 @@ export type HumorFlavorStep = {
   llm_system_prompt: string | null;
   llm_user_prompt: string | null;
   description: string | null;
+  
+  // Joined fields
+  humor_flavor_step_types?: HumorFlavorStepType;
+  llm_models?: LLMModel;
+};
+
+export type HumorFlavorStepType = {
+  id: number;
+  slug: string;
+  description: string;
+};
+
+export type LLMModel = {
+  id: number;
+  name: string;
+  provider_model_id: string;
+  is_temperature_supported: boolean;
+};
+
+export type LLMInputType = {
+  id: number;
+  slug: string;
+  description: string;
+};
+
+export type LLMOutputType = {
+  id: number;
+  slug: string;
+  description: string;
 };
