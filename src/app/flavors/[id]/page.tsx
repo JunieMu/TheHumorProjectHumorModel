@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { HumorFlavor } from "@/types/database";
 import Link from "next/link";
@@ -11,11 +11,11 @@ import { useRouter } from "next/navigation";
 import { HumorFlavorStepList } from "@/components/HumorFlavorStepList";
 
 interface FlavorPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default function FlavorPage({ params }: FlavorPageProps) {
-  const flavorId = params.id;
+  const { id: flavorId } = use(params);
   const numericFlavorId = parseInt(flavorId);
   const router = useRouter();
   const [flavor, setFlavor] = useState<HumorFlavor | null>(null);
@@ -45,7 +45,9 @@ export default function FlavorPage({ params }: FlavorPageProps) {
       }
     }
 
-    fetchFlavor();
+    if (flavorId) {
+      fetchFlavor();
+    }
   }, [flavorId, supabase]);
 
   const handleUpdate = async (e: React.FormEvent) => {
