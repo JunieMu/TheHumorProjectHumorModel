@@ -209,3 +209,19 @@ curl -X POST https://api.almostcrackd.ai/pipeline/generate-captions
 “humorFlavorId”:
 
 }’
+
+Instructions for Google OAuth:
+Here’s our Google OAuth Client ID:
+
+388960353527-fh4grc6mla425lg0e3g1hh67omtrdihd.apps.googleusercontent.com
+
+The assignment can/should be done without a Google Client Secret.
+
+The redirect must follow this pattern: https://*.vercel.app/auth/callback
+I suggest using the following NodeJS packages:
+
+@supabase/ssr (server/browser auth client wiring)
+
+@supabase/supabase-js (Auth API calls)
+
+Note: Please do not update/enable/disable any RLS policies in Supabase.

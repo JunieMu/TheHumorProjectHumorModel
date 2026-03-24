@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/utils/supabase/client";
 import { HumorFlavor } from "@/types/database";
 import { HumorFlavorCard } from "./HumorFlavorCard";
 import { Loader2 } from "lucide-react";
@@ -10,6 +10,7 @@ export function HumorFlavorList() {
   const [flavors, setFlavors] = useState<HumorFlavor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const supabase = createClient();
 
   useEffect(() => {
     async function fetchFlavors() {

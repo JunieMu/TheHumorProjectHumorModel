@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft, Play } from "lucide-react";
+import { LogoutButton } from "@/components/LogoutButton";
 
 interface FlavorPageProps {
   params: { id: string };
@@ -11,14 +12,17 @@ export default function FlavorPage({ params }: FlavorPageProps) {
   return (
     <main className="max-w-6xl mx-auto p-8">
       <header className="mb-12 border-b-2 border-vintage-gray pb-6 flex justify-between items-end">
-        <div>
-          <Link
-            href="/"
-            className="flex items-center text-xs font-bold font-typewriter uppercase mb-4 hover:text-vintage-blue-dark transition-colors"
-          >
-            <ArrowLeft size={14} className="mr-1" />
-            Back to Archives
-          </Link>
+        <div className="flex-1">
+          <div className="flex justify-between items-start">
+            <Link
+              href="/"
+              className="flex items-center text-xs font-bold font-typewriter uppercase mb-4 hover:text-vintage-blue-dark transition-colors"
+            >
+              <ArrowLeft size={14} className="mr-1" />
+              Back to Archives
+            </Link>
+            <LogoutButton />
+          </div>
           <h1 className="text-4xl font-bold font-typewriter uppercase tracking-widest text-vintage-gray">
             Flavor Management
           </h1>
@@ -26,7 +30,7 @@ export default function FlavorPage({ params }: FlavorPageProps) {
             Currently editing flavor index: {flavorId}
           </p>
         </div>
-        <button className="vintage-button flex items-center gap-2 bg-vintage-green hover:bg-vintage-green-dark">
+        <button className="vintage-button flex items-center gap-2 bg-vintage-green hover:bg-vintage-green-dark ml-8">
           <Play size={18} />
           <span className="font-bold uppercase tracking-tight">Test Flavor</span>
         </button>
