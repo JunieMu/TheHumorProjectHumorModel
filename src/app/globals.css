@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --color-vintage-cream: #fdfbf7;
+  --color-vintage-cream-dark: #f5f1e9;
+  --color-vintage-blue: #a8dadc;
+  --color-vintage-blue-dark: #457b9d;
+  --color-vintage-green: #ccd5ae;
+  --color-vintage-green-dark: #7b8a56;
+  --color-vintage-yellow: #faedcd;
+  --color-vintage-yellow-dark: #d4a373;
+  --color-vintage-pink: #fec89a;
+  --color-vintage-pink-dark: #e76f51;
+  --color-vintage-gray: #3d405b;
+  --font-typewriter: "Courier Prime", "Courier New", "Courier", monospace;
+}
+
+:root {
+  --background: #fdfbf7;
+  --foreground: #3d405b;
+}
+
+body {
+  color: var(--foreground);
+  background-color: var(--background);
+  font-family: var(--font-typewriter);
+}
+
+@layer components {
+  .vintage-paper {
+    background-color: #fdfbf7;
+    background-image: 
+      linear-gradient(90deg, rgba(204, 213, 174, 0.1) 1px, transparent 1px),
+      linear-gradient(rgba(204, 213, 174, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .plaid-pattern {
+    background-color: #fdfbf7;
+    background-image: 
+      repeating-linear-gradient(45deg, rgba(168, 218, 220, 0.1) 0, rgba(168, 218, 220, 0.1) 10px, transparent 10px, transparent 20px),
+      repeating-linear-gradient(-45deg, rgba(254, 200, 154, 0.1) 0, rgba(254, 200, 154, 0.1) 10px, transparent 10px, transparent 20px);
+  }
+
+  .vintage-border {
+    border: 2px solid #d4a373;
+    box-shadow: 4px 4px 0px #faedcd;
+  }
+
+  .vintage-button {
+    @apply px-4 py-2 border-2 border-vintage-gray bg-vintage-yellow hover:bg-vintage-yellow-dark transition-colors cursor-pointer;
+    box-shadow: 3px 3px 0px #3d405b;
+  }
+
+  .vintage-button:active {
+    box-shadow: 1px 1px 0px #3d405b;
+    transform: translate(2px, 2px);
+  }
+
+  .typewriter-text {
+    font-family: var(--font-typewriter);
+  }
+}
