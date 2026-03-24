@@ -9,6 +9,7 @@ import { LogoutButton } from "@/components/LogoutButton";
 import { useRouter } from "next/navigation";
 
 import { HumorFlavorStepList } from "@/components/HumorFlavorStepList";
+import { TestFlavorModal } from "@/components/TestFlavorModal";
 
 interface FlavorPageProps {
   params: Promise<{ id: string }>;
@@ -23,6 +24,7 @@ export default function FlavorPage({ params }: FlavorPageProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({ slug: "", description: "" });
+  const [isTestModalOpen, setIsTestModalOpen] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -115,7 +117,10 @@ export default function FlavorPage({ params }: FlavorPageProps) {
             Entry ID: {flavor.id} • Registered {new Date(flavor.created_datetime_utc).toLocaleDateString()}
           </p>
         </div>
-        <button className="vintage-button flex items-center gap-2 bg-vintage-green hover:bg-vintage-green-dark ml-8">
+        <button 
+          onClick={() => setIsTestModalOpen(true)}
+          className="vintage-button flex items-center gap-2 bg-vintage-green hover:bg-vintage-green-dark ml-8"
+        >
           <Play size={18} />
           <span className="font-bold uppercase tracking-tight">Test Flavor</span>
         </button>
@@ -173,6 +178,13 @@ export default function FlavorPage({ params }: FlavorPageProps) {
           </div>
         </aside>
       </div>
+
+      <TestFlavorModal
+        isOpen={isTestModalOpen}
+        onClose={() => setIsTestModalOpen(false)}
+        flavorId={numericFlavorId}
+        flavorSlug={flavor.slug}
+      />
     </main>
   );
 }
