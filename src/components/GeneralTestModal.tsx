@@ -41,7 +41,7 @@ export function GeneralTestModal({ isOpen, onClose }: GeneralTestModalProps) {
       try {
         const { data, error } = await supabase
           .from("humor_flavors")
-          .select("id, slug")
+          .select("*")
           .order("slug", { ascending: true });
 
         if (error) throw error;
