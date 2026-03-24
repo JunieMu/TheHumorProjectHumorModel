@@ -6,6 +6,7 @@ import { HumorFlavorStep } from "@/types/database";
 import { HumorFlavorStepCard } from "./HumorFlavorStepCard";
 import { HumorFlavorStepModal } from "./HumorFlavorStepModal";
 import { Loader2, Plus, ArrowDown } from "lucide-react";
+import { ConfirmationModal } from "./ConfirmationModal";
 
 interface HumorFlavorStepListProps {
   flavorId: number;
@@ -16,6 +17,9 @@ export function HumorFlavorStepList({ flavorId }: HumorFlavorStepListProps) {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStep, setEditingStep] = useState<HumorFlavorStep | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [stepToDelete, setStepToDelete] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const supabase = createClient();
 
   const fetchSteps = useCallback(async () => {
@@ -73,19 +77,28 @@ export function HumorFlavorStepList({ flavorId }: HumorFlavorStepListProps) {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to remove this step from the chain?")) return;
+  const handleDelete = async () => {
+    if (stepToDelete === null) return;
 
+    setIsDeleting(true);
     try {
-      const { error } = await supabase.from("humor_flavor_steps").delete().eq("id", id);
+      const { error } = await supabase.from("humor_flavor_steps").delete().eq("id", stepToDelete);
       if (error) throw error;
       
-      // Update other steps' order_by to close the gap? 
-      // Actually, simple order_by works fine even with gaps, but let's just refresh.
+      setIsConfirmOpen(false);
+      setStepToDelete(null);
       fetchSteps();
     } catch (err) {
       console.error("Error deleting step:", err);
+      alert("Failed to delete step. Please try again.");
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  const openDeleteConfirmation = (id: number) => {
+    setStepToDelete(id);
+    setIsConfirmOpen(true);
   };
 
   if (loading && steps.length === 0) {
@@ -137,7 +150,7 @@ export function HumorFlavorStepList({ flavorId }: HumorFlavorStepListProps) {
                 totalSteps={steps.length}
                 onMoveUp={() => handleMove(idx, "up")}
                 onMoveDown={() => handleMove(idx, "down")}
-                onDelete={() => handleDelete(step.id)}
+                onDelete={() => openDeleteConfirmation(step.id)}
                 onEdit={() => {
                   setEditingStep(step);
                   setIsModalOpen(true);
@@ -162,6 +175,17 @@ export function HumorFlavorStepList({ flavorId }: HumorFlavorStepListProps) {
         flavorId={flavorId}
         step={editingStep}
         nextOrder={steps.length > 0 ? Math.max(...steps.map(s => s.order_by)) + 1 : 1}
+      />
+
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={() => !isDeleting && setIsConfirmOpen(false)}
+        onConfirm={handleDelete}
+        isLoading={isDeleting}
+        title="Remove Chain Step?"
+        message="This will permanently delete this step from the prompt chain. Subsequent steps may require manual adjustment if they depend on this output."
+        confirmText="Sever Connection"
+        variant="danger"
       />
     </div>
   );
