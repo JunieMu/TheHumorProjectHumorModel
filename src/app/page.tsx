@@ -19,14 +19,6 @@ export default function Home() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <section className="md:col-span-2">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold font-typewriter text-vintage-gray">
-              Active Flavors
-            </h2>
-            <button className="vintage-button text-sm uppercase font-bold tracking-tight">
-              + New Flavor
-            </button>
-          </div>
           <HumorFlavorList />
         </section>
 

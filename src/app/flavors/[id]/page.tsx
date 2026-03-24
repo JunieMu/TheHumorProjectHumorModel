@@ -1,6 +1,12 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
+import { HumorFlavor } from "@/types/database";
 import Link from "next/link";
-import { ArrowLeft, Play } from "lucide-react";
+import { ArrowLeft, Play, Loader2, Save, Trash2 } from "lucide-react";
 import { LogoutButton } from "@/components/LogoutButton";
+import { useRouter } from "next/navigation";
 
 interface FlavorPageProps {
   params: { id: string };
@@ -8,6 +14,80 @@ interface FlavorPageProps {
 
 export default function FlavorPage({ params }: FlavorPageProps) {
   const flavorId = params.id;
+  const router = useRouter();
+  const [flavor, setFlavor] = useState<HumorFlavor | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({ slug: "", description: "" });
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function fetchFlavor() {
+      try {
+        const { data, error } = await supabase
+          .from("humor_flavors")
+          .select("*")
+          .eq("id", flavorId)
+          .single();
+
+        if (error) throw error;
+        setFlavor(data);
+        setFormData({ slug: data.slug, description: data.description || "" });
+      } catch (err: any) {
+        console.error("Error fetching flavor:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchFlavor();
+  }, [flavorId, supabase]);
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("humor_flavors")
+        .update({
+          slug: formData.slug.toLowerCase().replace(/\s+/g, "-"),
+          description: formData.description,
+          modified_datetime_utc: new Date().toISOString(),
+        })
+        .eq("id", flavorId);
+
+      if (error) throw error;
+      alert("Flavor updated successfully.");
+    } catch (err: any) {
+      console.error("Error updating flavor:", err);
+      alert("Failed to update flavor: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center vintage-paper">
+        <Loader2 className="animate-spin text-vintage-blue-dark mr-2" />
+        <span className="font-typewriter italic">Opening archive index {flavorId}...</span>
+      </div>
+    );
+  }
+
+  if (error || !flavor) {
+    return (
+      <main className="max-w-6xl mx-auto p-8 font-typewriter">
+        <div className="vintage-border p-12 bg-vintage-pink/10 text-center">
+          <h2 className="text-2xl font-bold uppercase text-vintage-pink-dark mb-4">Entry Not Found</h2>
+          <p className="mb-8">We could not retrieve flavor index {flavorId} from the archives.</p>
+          <Link href="/" className="vintage-button text-xs uppercase font-bold">Return to Archives</Link>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="max-w-6xl mx-auto p-8">
@@ -27,7 +107,7 @@ export default function FlavorPage({ params }: FlavorPageProps) {
             Flavor Management
           </h1>
           <p className="text-vintage-gray/70 mt-2 font-typewriter italic">
-            Currently editing flavor index: {flavorId}
+            Entry ID: {flavor.id} • Registered {new Date(flavor.created_datetime_utc).toLocaleDateString()}
           </p>
         </div>
         <button className="vintage-button flex items-center gap-2 bg-vintage-green hover:bg-vintage-green-dark ml-8">
@@ -48,7 +128,7 @@ export default function FlavorPage({ params }: FlavorPageProps) {
               </button>
             </div>
             
-            {/* Steps will go here */}
+            {/* Steps will go here in the next task */}
             <div className="flex flex-col items-center justify-center py-20 bg-vintage-cream/50 border-2 border-dashed border-vintage-gray/20">
               <p className="font-typewriter text-sm text-vintage-gray/60 italic">
                 This flavor currently has no steps defined.
@@ -62,11 +142,14 @@ export default function FlavorPage({ params }: FlavorPageProps) {
             <h3 className="font-bold font-typewriter text-vintage-gray uppercase mb-4 border-b border-vintage-gray/20 pb-2">
               Flavor Details
             </h3>
-            <form className="space-y-4 font-typewriter text-sm">
+            <form onSubmit={handleUpdate} className="space-y-4 font-typewriter text-sm">
               <div>
                 <label className="block font-bold uppercase mb-1">Slug</label>
                 <input
                   type="text"
+                  required
+                  value={formData.slug}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                   className="w-full bg-transparent border-b border-vintage-gray/50 focus:border-vintage-blue-dark outline-none py-1"
                   placeholder="e.g. funny-sarcastic"
                 />
@@ -74,12 +157,19 @@ export default function FlavorPage({ params }: FlavorPageProps) {
               <div>
                 <label className="block font-bold uppercase mb-1">Description</label>
                 <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full bg-transparent border border-vintage-gray/30 focus:border-vintage-blue-dark outline-none p-2 min-h-[100px]"
                   placeholder="What makes this flavor unique?"
                 />
               </div>
-              <button className="vintage-button w-full mt-4 text-xs uppercase font-bold">
-                Save Changes
+              <button 
+                type="submit" 
+                disabled={saving}
+                className="vintage-button w-full mt-4 text-xs uppercase font-bold flex items-center justify-center gap-2"
+              >
+                {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                {saving ? "Updating..." : "Save Changes"}
               </button>
             </form>
           </div>
