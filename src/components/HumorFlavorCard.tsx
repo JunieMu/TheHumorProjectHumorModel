@@ -10,50 +10,29 @@ import { ConfirmationModal } from "./ConfirmationModal";
 interface HumorFlavorCardProps {
   flavor: HumorFlavor;
   stepCount: number;
+  captionCount: number;
+  isActive: boolean;
+  onToggleActive: () => void;
   onDeleteSuccess: () => void;
 }
 
-function getStoredActive(flavorId: number): boolean {
-  try {
-    const val = localStorage.getItem(`flavor_active_${flavorId}`);
-    return val === null ? true : val === "true";
-  } catch {
-    return true;
-  }
-}
-
-function setStoredActive(flavorId: number, value: boolean) {
-  try {
-    localStorage.setItem(`flavor_active_${flavorId}`, String(value));
-  } catch {
-    // ignore
-  }
-}
-
-export function HumorFlavorCard({ flavor, stepCount, onDeleteSuccess }: HumorFlavorCardProps) {
+export function HumorFlavorCard({
+  flavor,
+  stepCount,
+  captionCount,
+  isActive,
+  onToggleActive,
+  onDeleteSuccess,
+}: HumorFlavorCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [isActive, setIsActive] = useState(() => getStoredActive(flavor.id));
   const supabase = createClient();
-
-  const effectiveActive = isActive && stepCount > 0;
-
-  const handleToggleActive = () => {
-    if (stepCount === 0) return;
-    const next = !isActive;
-    setIsActive(next);
-    setStoredActive(flavor.id, next);
-  };
 
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      // Step 1: Delete steps (Supabase might have ON DELETE CASCADE, but let's be safe if it doesn't)
       await supabase.from("humor_flavor_steps").delete().eq("humor_flavor_id", flavor.id);
-      
-      // Step 2: Delete flavor
       const { error } = await supabase.from("humor_flavors").delete().eq("id", flavor.id);
-
       if (error) throw error;
       onDeleteSuccess();
       setIsConfirmOpen(false);
@@ -85,7 +64,7 @@ export function HumorFlavorCard({ flavor, stepCount, onDeleteSuccess }: HumorFla
             >
               <Edit3 size={16} className="text-vintage-gray" />
             </Link>
-            <button 
+            <button
               onClick={() => setIsConfirmOpen(true)}
               className="p-2 border border-vintage-gray/20 hover:bg-vintage-pink/30 rounded transition-colors"
             >
@@ -94,21 +73,28 @@ export function HumorFlavorCard({ flavor, stepCount, onDeleteSuccess }: HumorFla
           </div>
         </div>
 
-        <p className="text-sm font-typewriter text-vintage-gray/80 line-clamp-2 mb-6">
+        <p className="text-sm font-typewriter text-vintage-gray/80 line-clamp-2 mb-4">
           {flavor.description || "No description provided."}
         </p>
 
+        <div className="flex items-center gap-3 mb-4 font-typewriter text-[10px] text-vintage-gray/50">
+          <span>{stepCount} {stepCount === 1 ? "step" : "steps"}</span>
+          <span>·</span>
+          <span>{captionCount} {captionCount === 1 ? "caption" : "captions"}</span>
+        </div>
+
         <div className="flex justify-between items-center">
           <button
-            onClick={handleToggleActive}
+            onClick={onToggleActive}
             title={stepCount === 0 ? "Add steps to activate this flavor" : undefined}
             className={`text-[10px] font-bold uppercase tracking-tighter px-2 py-0.5 border border-vintage-gray/20 transition-colors ${
-              effectiveActive
+              isActive
                 ? "bg-vintage-green hover:bg-vintage-green-dark cursor-pointer"
-                : "bg-vintage-gray/10 text-vintage-gray/50 " + (stepCount > 0 ? "hover:bg-vintage-gray/20 cursor-pointer" : "cursor-not-allowed")
+                : "bg-vintage-gray/10 text-vintage-gray/50 " +
+                  (stepCount > 0 ? "hover:bg-vintage-gray/20 cursor-pointer" : "cursor-not-allowed")
             }`}
           >
-            {effectiveActive ? "Active" : "Inactive"}
+            {isActive ? "Active" : "Inactive"}
           </button>
           <Link
             href={`/flavors/${flavor.id}`}
