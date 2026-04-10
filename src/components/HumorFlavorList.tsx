@@ -40,6 +40,7 @@ export function HumorFlavorList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>("recent");
   const [activeFilter, setActiveFilter] = useState<ActiveFilter>("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const supabase = createClient();
 
   const fetchFlavors = useCallback(async () => {
@@ -127,9 +128,19 @@ export function HumorFlavorList() {
   });
 
   const filtered = sorted.filter((f) => {
-    if (activeFilter === "all") return true;
-    const ea = getEffectiveActive(f);
-    return activeFilter === "active" ? ea : !ea;
+    if (activeFilter !== "all") {
+      const ea = getEffectiveActive(f);
+      if (activeFilter === "active" && !ea) return false;
+      if (activeFilter === "inactive" && ea) return false;
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      return (
+        f.slug.toLowerCase().includes(q) ||
+        (f.description ?? "").toLowerCase().includes(q)
+      );
+    }
+    return true;
   });
 
   if (loading && flavors.length === 0) {
@@ -185,6 +196,14 @@ export function HumorFlavorList() {
 
       {/* Controls */}
       <div className="vintage-border bg-vintage-cream-dark p-4 mb-5 space-y-3">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search archives..."
+          className="w-full bg-transparent border-b border-vintage-gray/30 focus:border-vintage-gray outline-none py-1 text-sm font-typewriter italic text-vintage-gray placeholder:text-vintage-gray/30"
+        />
+        <div className="border-t border-vintage-gray/10" />
         <div className="flex items-baseline gap-4 flex-wrap">
           <span className="text-[10px] font-bold uppercase tracking-widest text-vintage-gray/40 font-typewriter w-12 shrink-0">
             Sort
