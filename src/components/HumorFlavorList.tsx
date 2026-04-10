@@ -7,8 +7,12 @@ import { HumorFlavorCard } from "./HumorFlavorCard";
 import { CreateFlavorModal } from "./CreateFlavorModal";
 import { Loader2, Plus } from "lucide-react";
 
+type FlavorWithCount = HumorFlavor & {
+  stepCount: number;
+};
+
 export function HumorFlavorList() {
-  const [flavors, setFlavors] = useState<HumorFlavor[]>([]);
+  const [flavors, setFlavors] = useState<FlavorWithCount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,13 +21,30 @@ export function HumorFlavorList() {
   const fetchFlavors = useCallback(async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data: flavorsData, error: flavorsError } = await supabase
         .from("humor_flavors")
         .select("*")
         .order("modified_datetime_utc", { ascending: false });
 
-      if (error) throw error;
-      setFlavors(data || []);
+      if (flavorsError) throw flavorsError;
+
+      const { data: stepsData, error: stepsError } = await supabase
+        .from("humor_flavor_steps")
+        .select("humor_flavor_id");
+
+      if (stepsError) throw stepsError;
+
+      const stepCounts: Record<number, number> = {};
+      for (const step of stepsData || []) {
+        stepCounts[step.humor_flavor_id] = (stepCounts[step.humor_flavor_id] || 0) + 1;
+      }
+
+      const merged = (flavorsData || []).map((f) => ({
+        ...f,
+        stepCount: stepCounts[f.id] ?? 0,
+      }));
+
+      setFlavors(merged);
     } catch (err: any) {
       console.error("Error fetching flavors:", err);
       setError(err.message);
@@ -90,9 +111,9 @@ export function HumorFlavorList() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {flavors.map((flavor) => (
-            <HumorFlavorCard key={flavor.id} flavor={flavor} onDeleteSuccess={fetchFlavors} />
+            <HumorFlavorCard key={flavor.id} flavor={flavor} stepCount={flavor.stepCount} onDeleteSuccess={fetchFlavors} />
           ))}
         </div>
       )}

@@ -2,20 +2,48 @@
 
 import { HumorFlavor } from "@/types/database";
 import Link from "next/link";
-import { Clock, Edit3, Trash2, Loader2 } from "lucide-react";
+import { Clock, Edit3, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { ConfirmationModal } from "./ConfirmationModal";
 
 interface HumorFlavorCardProps {
   flavor: HumorFlavor;
+  stepCount: number;
   onDeleteSuccess: () => void;
 }
 
-export function HumorFlavorCard({ flavor, onDeleteSuccess }: HumorFlavorCardProps) {
+function getStoredActive(flavorId: number): boolean {
+  try {
+    const val = localStorage.getItem(`flavor_active_${flavorId}`);
+    return val === null ? true : val === "true";
+  } catch {
+    return true;
+  }
+}
+
+function setStoredActive(flavorId: number, value: boolean) {
+  try {
+    localStorage.setItem(`flavor_active_${flavorId}`, String(value));
+  } catch {
+    // ignore
+  }
+}
+
+export function HumorFlavorCard({ flavor, stepCount, onDeleteSuccess }: HumorFlavorCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isActive, setIsActive] = useState(() => getStoredActive(flavor.id));
   const supabase = createClient();
+
+  const effectiveActive = isActive && stepCount > 0;
+
+  const handleToggleActive = () => {
+    if (stepCount === 0) return;
+    const next = !isActive;
+    setIsActive(next);
+    setStoredActive(flavor.id, next);
+  };
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -39,7 +67,7 @@ export function HumorFlavorCard({ flavor, onDeleteSuccess }: HumorFlavorCardProp
 
   return (
     <>
-      <div className="vintage-border p-6 bg-vintage-cream-dark transition-all hover:-translate-y-1 hover:shadow-lg">
+      <div className="vintage-border p-4 bg-vintage-cream-dark transition-all hover:-translate-y-1 hover:shadow-lg">
         <div className="flex justify-between items-start mb-4">
           <div>
             <h3 className="text-xl font-bold font-typewriter text-vintage-gray uppercase">
@@ -71,9 +99,17 @@ export function HumorFlavorCard({ flavor, onDeleteSuccess }: HumorFlavorCardProp
         </p>
 
         <div className="flex justify-between items-center">
-          <span className="text-[10px] font-bold uppercase tracking-tighter bg-vintage-green px-2 py-0.5 border border-vintage-gray/20">
-            Active
-          </span>
+          <button
+            onClick={handleToggleActive}
+            title={stepCount === 0 ? "Add steps to activate this flavor" : undefined}
+            className={`text-[10px] font-bold uppercase tracking-tighter px-2 py-0.5 border border-vintage-gray/20 transition-colors ${
+              effectiveActive
+                ? "bg-vintage-green hover:bg-vintage-green-dark cursor-pointer"
+                : "bg-vintage-gray/10 text-vintage-gray/50 " + (stepCount > 0 ? "hover:bg-vintage-gray/20 cursor-pointer" : "cursor-not-allowed")
+            }`}
+          >
+            {effectiveActive ? "Active" : "Inactive"}
+          </button>
           <Link
             href={`/flavors/${flavor.id}`}
             className="text-xs font-bold font-typewriter underline underline-offset-4 hover:text-vintage-blue-dark transition-colors"
