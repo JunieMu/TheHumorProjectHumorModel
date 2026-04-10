@@ -184,39 +184,49 @@ export function HumorFlavorList() {
       </div>
 
       {/* Controls */}
-      <div className="flex flex-wrap items-center gap-3 mb-5 pb-4 border-b border-vintage-gray/10">
-        {/* Sort dropdown */}
-        <div className="flex items-center gap-2 font-typewriter text-xs">
-          <span className="uppercase font-bold text-vintage-gray/50">Sort:</span>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as SortOption)}
-            className="bg-vintage-cream-dark border border-vintage-gray/30 focus:border-vintage-blue-dark outline-none px-2 py-1 text-xs font-typewriter uppercase font-bold text-vintage-gray cursor-pointer"
-          >
+      <div className="vintage-border bg-vintage-cream-dark p-4 mb-5 space-y-3">
+        <div className="flex items-baseline gap-4 flex-wrap">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-vintage-gray/40 font-typewriter w-12 shrink-0">
+            Sort
+          </span>
+          <div className="flex flex-wrap gap-x-5 gap-y-1">
             {(Object.keys(SORT_LABELS) as SortOption[]).map((key) => (
-              <option key={key} value={key}>
+              <button
+                key={key}
+                onClick={() => setSortBy(key)}
+                className={`text-xs font-typewriter transition-colors ${
+                  sortBy === key
+                    ? "font-bold text-vintage-gray underline underline-offset-4 decoration-vintage-yellow-dark"
+                    : "text-vintage-gray/40 hover:text-vintage-gray/70"
+                }`}
+              >
                 {SORT_LABELS[key]}
-              </option>
+              </button>
             ))}
-          </select>
+          </div>
         </div>
 
-        {/* Active filter */}
-        <div className="flex items-center gap-1 font-typewriter text-xs ml-auto">
-          <span className="uppercase font-bold text-vintage-gray/50 mr-1">Show:</span>
-          {(["all", "active", "inactive"] as ActiveFilter[]).map((f) => (
-            <button
-              key={f}
-              onClick={() => setActiveFilter(f)}
-              className={`px-3 py-1 border text-[10px] uppercase font-bold tracking-tight transition-colors ${
-                activeFilter === f
-                  ? "bg-vintage-gray text-white border-vintage-gray"
-                  : "border-vintage-gray/30 text-vintage-gray/60 hover:bg-vintage-gray/10"
-              }`}
-            >
-              {f}
-            </button>
-          ))}
+        <div className="border-t border-vintage-gray/10" />
+
+        <div className="flex items-baseline gap-4">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-vintage-gray/40 font-typewriter w-12 shrink-0">
+            Show
+          </span>
+          <div className="flex gap-5">
+            {(["all", "active", "inactive"] as ActiveFilter[]).map((f) => (
+              <button
+                key={f}
+                onClick={() => setActiveFilter(f)}
+                className={`text-xs font-typewriter capitalize transition-colors ${
+                  activeFilter === f
+                    ? "font-bold text-vintage-gray underline underline-offset-4 decoration-vintage-yellow-dark"
+                    : "text-vintage-gray/40 hover:text-vintage-gray/70"
+                }`}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
