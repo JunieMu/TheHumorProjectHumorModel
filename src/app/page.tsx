@@ -44,7 +44,7 @@ export default function Home() {
               Quick Actions
             </h3>
             <div className="flex flex-col gap-3">
-              <button 
+              <button
                 onClick={() => setIsTestModalOpen(true)}
                 className="vintage-button text-xs uppercase font-bold flex items-center justify-center gap-2 py-2"
               >
@@ -54,13 +54,36 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="vintage-border p-6 bg-vintage-yellow/20">
-            <h3 className="font-bold font-typewriter text-vintage-gray uppercase mb-4">
-              System Notice
+          <div className="vintage-border p-6 bg-vintage-cream-dark">
+            <h3 className="font-bold font-typewriter text-vintage-gray uppercase mb-3">
+              About This Tool
             </h3>
-            <p className="font-typewriter text-[10px] text-vintage-gray/60 leading-relaxed italic">
-              "Every successful flavor extraction begins with a precisely calibrated prompt chain. Ensure all steps are documented in the archive."
+            <p className="font-typewriter text-xs text-vintage-gray/70 leading-relaxed">
+              The Humor Model Project is a research tool for designing and testing <span className="italic">humor flavors</span> — configurable prompt pipelines that instruct an LLM to generate funny captions for a given image. Each flavor is made up of an ordered chain of steps, where each step defines a system prompt, user prompt, model, and temperature.
             </p>
+          </div>
+
+          <div className="vintage-border p-6 bg-vintage-green/20">
+            <h3 className="font-bold font-typewriter text-vintage-gray uppercase mb-3">
+              Testing a Flavor
+            </h3>
+            <ol className="font-typewriter text-xs text-vintage-gray/70 leading-relaxed space-y-2 list-none">
+              <li><span className="font-bold text-vintage-gray">1.</span> Open a flavor and click <span className="font-bold">Test Flavor</span>, or use <span className="font-bold">Test Image Pipeline</span> from the sidebar to pick any flavor.</li>
+              <li><span className="font-bold text-vintage-gray">2.</span> Upload an image — the pipeline will request a presigned URL, upload your image, register it, then run the prompt chain.</li>
+              <li><span className="font-bold text-vintage-gray">3.</span> Generated captions appear in the Results Output panel.</li>
+            </ol>
+          </div>
+
+          <div className="vintage-border p-6 bg-vintage-yellow/20">
+            <h3 className="font-bold font-typewriter text-vintage-gray uppercase mb-3">
+              Creating a Flavor
+            </h3>
+            <ol className="font-typewriter text-xs text-vintage-gray/70 leading-relaxed space-y-2 list-none">
+              <li><span className="font-bold text-vintage-gray">1.</span> Click <span className="font-bold">New Flavor</span> and give it a slug (e.g. <span className="italic">dry-wit</span>) and a description of the comedic style.</li>
+              <li><span className="font-bold text-vintage-gray">2.</span> Open the flavor and click <span className="font-bold">Add Step</span> to build out the prompt chain.</li>
+              <li><span className="font-bold text-vintage-gray">3.</span> For each step, set the model, step type, input/output types, prompts, and temperature.</li>
+              <li><span className="font-bold text-vintage-gray">4.</span> Use the arrows to reorder steps. A flavor with no steps is automatically marked <span className="font-bold">Inactive</span>.</li>
+            </ol>
           </div>
         </aside>
       </div>
