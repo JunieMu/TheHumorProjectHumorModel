@@ -55,8 +55,8 @@ export function HumorFlavorList() {
 
       const [{ data: stepsData, error: stepsError }, { data: captionsData, error: captionsError }] =
         await Promise.all([
-          supabase.from("humor_flavor_steps").select("humor_flavor_id"),
-          supabase.from("captions").select("humor_flavor_id"),
+          supabase.from("humor_flavor_steps").select("humor_flavor_id").limit(10000),
+          supabase.from("captions").select("humor_flavor_id").limit(10000),
         ]);
 
       if (stepsError) throw stepsError;

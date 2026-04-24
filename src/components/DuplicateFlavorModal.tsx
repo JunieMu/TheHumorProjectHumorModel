@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { HumorFlavor } from "@/types/database";
 import { X, Loader2, Copy } from "lucide-react";
@@ -22,6 +22,13 @@ export function DuplicateFlavorModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
+
+  useEffect(() => {
+    if (isOpen) {
+      setSlug(`${flavor.slug}-copy`);
+      setError(null);
+    }
+  }, [isOpen, flavor.slug]);
 
   if (!isOpen) return null;
 

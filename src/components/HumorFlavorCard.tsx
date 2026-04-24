@@ -33,7 +33,8 @@ export function HumorFlavorCard({
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await supabase.from("humor_flavor_steps").delete().eq("humor_flavor_id", flavor.id);
+      const { error: stepsError } = await supabase.from("humor_flavor_steps").delete().eq("humor_flavor_id", flavor.id);
+      if (stepsError) throw stepsError;
       const { error } = await supabase.from("humor_flavors").delete().eq("id", flavor.id);
       if (error) throw error;
       onDeleteSuccess();
