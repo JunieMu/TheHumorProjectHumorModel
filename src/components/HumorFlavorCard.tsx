@@ -2,10 +2,11 @@
 
 import { HumorFlavor } from "@/types/database";
 import Link from "next/link";
-import { Clock, Edit3, Trash2 } from "lucide-react";
+import { Clock, Edit3, Trash2, Copy } from "lucide-react";
 import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { ConfirmationModal } from "./ConfirmationModal";
+import { DuplicateFlavorModal } from "./DuplicateFlavorModal";
 
 interface HumorFlavorCardProps {
   flavor: HumorFlavor;
@@ -26,6 +27,7 @@ export function HumorFlavorCard({
 }: HumorFlavorCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isDuplicateOpen, setIsDuplicateOpen] = useState(false);
   const supabase = createClient();
 
   const handleDelete = async () => {
@@ -64,6 +66,13 @@ export function HumorFlavorCard({
             >
               <Edit3 size={16} className="text-vintage-gray" />
             </Link>
+            <button
+              onClick={() => setIsDuplicateOpen(true)}
+              title="Duplicate flavor"
+              className="p-2 border border-vintage-gray/20 hover:bg-vintage-blue/20 rounded transition-colors"
+            >
+              <Copy size={16} className="text-vintage-gray" />
+            </button>
             <button
               onClick={() => setIsConfirmOpen(true)}
               className="p-2 border border-vintage-gray/20 hover:bg-vintage-pink/30 rounded transition-colors"
@@ -114,6 +123,13 @@ export function HumorFlavorCard({
         message={`This action will permanently remove "${flavor.slug}" and all associated pipeline steps from the archive. This cannot be undone.`}
         confirmText="Expunge Record"
         variant="danger"
+      />
+
+      <DuplicateFlavorModal
+        isOpen={isDuplicateOpen}
+        onClose={() => setIsDuplicateOpen(false)}
+        onSuccess={onDeleteSuccess}
+        flavor={flavor}
       />
     </>
   );
